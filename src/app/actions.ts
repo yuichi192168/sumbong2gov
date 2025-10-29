@@ -200,7 +200,7 @@ export async function submitGrievance(formData: FormData) {
 export async function getGrievances(status?: string, limit = 50) {
   try {
     let query = supabase
-      .from('grievances')
+      .from('grievance_with_support_count')
       .select('*, agencies(name)')
       .order('created_at', { ascending: false });
 
@@ -229,18 +229,42 @@ export async function getGrievances(status?: string, limit = 50) {
 
 export async function getGrievanceById(id: string) {
   try {
-    const { data, error } = await supabase
-      .from('grievances')
+    const cookieStore = await cookies();
+    const supportTokenCookie = cookieStore.get('support-token');
+    const supportToken = supportTokenCookie?.value;
+
+    // Get grievance data with support count
+    const { data: grievance, error: grievanceError } = await supabase
+      .from('grievance_with_support_count')
       .select('*, agencies(name)')
       .eq('id', id)
       .single();
 
-    if (error) {
-      console.error('Supabase query error:', error);
-      return { success: false, error: 'Grievance not found: ' + error.message };
+    if (grievanceError) {
+      console.error('Supabase query error:', grievanceError);
+      return { success: false, error: 'Grievance not found: ' + grievanceError.message };
     }
 
-    return { success: true, data };
+    // If we have a support token, check if user has supported this grievance
+    let isSupported = false;
+    if (supportToken) {
+      const { data: supportData } = await supabase
+        .from('grievance_supports')
+        .select('id')
+        .eq('grievance_id', id)
+        .eq('supporter_ip', supportToken)
+        .single();
+
+      isSupported = !!supportData;
+    }
+
+    return { 
+      success: true, 
+      data: { 
+        ...grievance, 
+        isSupported 
+      } 
+    };
   } catch (error) {
     console.error('Get grievance failed:', error);
     const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
