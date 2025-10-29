@@ -16,9 +16,14 @@ import { formatDistanceToNow } from 'date-fns';
 import { Clock, Landmark, User, UserX, Hourglass, CheckCircle2, XCircle } from 'lucide-react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import { SupportButton } from './support-button';
 
 interface GrievanceCardProps {
-  grievance: GrievanceRecord & { agencies: { name: string } | null, image_url?: string | null };
+  grievance: GrievanceRecord & { 
+    agencies: { name: string } | null;
+    image_url?: string | null;
+    support_count?: number;
+  };
 }
 
 const statusConfig = {
@@ -43,60 +48,68 @@ export function GrievanceCard({ grievance }: GrievanceCardProps) {
   }, [grievance.created_at]);
 
   return (
-    <Link href={`/grievance/${grievance.id}`} className="block h-full">
-        <Card className="flex flex-col h-full hover:shadow-xl transition-shadow duration-300 bg-card">
-          {grievance.image_url && (
-            <div className="relative w-full h-48">
-              <Image
-                src={grievance.image_url}
-                alt={grievance.title || 'Grievance image'}
-                fill
-                className="object-cover rounded-t-lg"
-              />
+    <div className="h-full">
+      <Card className="flex flex-col h-full hover:shadow-xl transition-shadow duration-300 bg-card">
+        {grievance.image_url && (
+          <div className="relative w-full h-48">
+            <Image
+              src={grievance.image_url}
+              alt={grievance.title || 'Grievance image'}
+              fill
+              className="object-cover rounded-t-lg"
+            />
+          </div>
+        )}
+        <div className="flex flex-col flex-grow">
+          <CardHeader>
+            <Link href={`/grievance/${grievance.id}`}>
+              <CardTitle className="text-lg font-headline line-clamp-2">{grievance.title}</CardTitle>
+            </Link>
+            <CardDescription className="flex items-center gap-2 pt-2">
+              {grievance.submitterName ? (
+                <>
+                  <User className="h-4 w-4" />
+                  <span>{grievance.submitterName}</span>
+                </>
+              ) : (
+                <>
+                  <UserX className="h-4 w-4" />
+                  <span>Anonymous</span>
+                </>
+              )}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex-grow">
+            <Link href={`/grievance/${grievance.id}`}>
+              <p className="text-sm text-foreground/80 line-clamp-3">
+                {grievance.description}
+              </p>
+            </Link>
+          </CardContent>
+        </div>
+        <CardFooter className="flex items-center justify-between gap-4 pt-4 border-t mt-auto">
+          <div className="flex-1 text-xs text-muted-foreground space-y-2">
+            <div className="flex items-center gap-2">
+              <Landmark className="h-4 w-4" />
+              <span>{grievance.agencies?.name || 'Unknown Agency'}</span>
             </div>
-          )}
-            <div className="flex flex-col flex-grow">
-              <CardHeader>
-                  <CardTitle className="text-lg font-headline line-clamp-2">{grievance.title}</CardTitle>
-                  <CardDescription className="flex items-center gap-2 pt-2">
-                    {grievance.submitter_name ? (
-                      <>
-                        <User className="h-4 w-4" />
-                        <span>{grievance.submitter_name}</span>
-                      </>
-                    ) : (
-                      <>
-                        <UserX className="h-4 w-4" />
-                        <span>Anonymous</span>
-                      </>
-                    )}
-                  </CardDescription>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <p className="text-sm text-foreground/80 line-clamp-3">
-                  {grievance.description}
-                </p>
-              </CardContent>
+            <div className="flex items-center gap-2" title={grievance.created_at}>
+              <Clock className="h-4 w-4" />
+              <span>{timeAgo}</span>
             </div>
-          <CardFooter className="flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t mt-auto">
-             <div className="text-xs text-muted-foreground space-y-2">
-                <div className="flex items-center gap-2">
-                    <Landmark className="h-4 w-4" />
-                    <span>{grievance.agencies?.name || 'Unknown Agency'}</span>
-                </div>
-                <div className="flex items-center gap-2" title={grievance.created_at}>
-                    <Clock className="h-4 w-4" />
-                    <span>{timeAgo}</span>
-                </div>
-            </div>
-            <div className="flex flex-col items-end gap-2">
-                <Badge variant="outline" className={`border-0 text-xs ${statusInfo.className}`}>
-                    <StatusIcon className="mr-1.5 h-3.5 w-3.5" />
-                    {statusInfo.label}
-                </Badge>
-            </div>
-          </CardFooter>
-        </Card>
-      </Link>
+          </div>
+          <div className="flex items-center gap-3">
+            <SupportButton 
+              grievanceId={grievance.id} 
+              initialCount={grievance.support_count || 0}
+            />
+            <Badge variant="outline" className={`border-0 text-xs ${statusInfo.className}`}>
+              <StatusIcon className="mr-1.5 h-3.5 w-3.5" />
+              {statusInfo.label}
+            </Badge>
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
   );
 }
