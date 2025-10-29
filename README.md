@@ -33,7 +33,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 - [Node.js](https://nodejs.org/en) (v18 or newer)
 - [npm](https://www.npmjs.com/) or a compatible package manager
-- A [Supabase](https://supabase.com/) account and a new project
+- [Supabase](https://supabase.com/) account and a new project
 
 ### 2. Set Up Environment Variables
 
