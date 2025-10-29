@@ -6,7 +6,7 @@ A public platform designed to empower citizens to voice, track, and resolve comm
 - **Public Grievance Dashboard**: A transparent view of all submitted issues and their current status.
 - **Simple Submission Form**: Easily report grievances, with the option to remain anonymous.
 - **Admin Management Panel**: A secure dashboard for moderators to review, update, and manage submissions.
-
+- **Support Button**: Other citizens can “support” a report to show it affects many people.
 ## Tech Stack
 
 - **Framework**: Next.js (App Router)
@@ -58,7 +58,6 @@ You need to run some SQL queries to set up the necessary tables and data in your
 
 1.  Navigate to the **SQL Editor** in your Supabase project dashboard.
 2.  Open the `setup.sql` file from this project, copy its contents, and run it in the SQL Editor. This will create the required tables and set the default admin password to **"ikulongnayanmgakurakot"**.
-3.  (Optional) For sample data, open the `sample-data.sql` file, copy its contents, and run it in the SQL Editor. This will populate the dashboard with 10 sample grievances.
 
 ### 4. Install Dependencies
 
